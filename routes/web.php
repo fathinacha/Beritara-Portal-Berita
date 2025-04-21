@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;  // Tambahkan ini
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\NewsController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,6 +28,12 @@ Route::middleware(['auth'])->group(function () {
             'user' => Auth::user()
         ]);
     });
+});
+
+// Category Routes
+Route::middleware(['auth'])->group(function () {
+    Route::resource('categories', CategoryController::class);
+    Route::resource('news', NewsController::class);
 });
 
 require __DIR__.'/auth.php';
