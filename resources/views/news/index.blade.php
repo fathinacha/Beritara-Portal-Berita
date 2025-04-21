@@ -1,0 +1,83 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('News Management') }}
+            </h2>
+            <a href="{{ route('news.create') }}" 
+               class="bg-indigo-600 hover:bg-indigo-700 text-black font-bold py-2 px-4 rounded">
+                Add New Article
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    @if(session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @forelse($news as $article)
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                @if($article->image)
+                                    <img src="{{ Storage::url($article->image) }}" 
+                                         alt="{{ $article->title }}"
+                                         class="w-full h-48 object-cover">
+                                @else
+                                    <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-400">No Image</span>
+                                    </div>
+                                @endif
+                                
+                                <div class="p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                            {{ $article->category->name }}
+                                        </span>
+                                        <span class="text-gray-500 text-sm">
+                                            {{ $article->created_at->format('M d, Y') }}
+                                        </span>
+                                    </div>
+                                    
+                                    <h3 class="text-xl font-bold mb-2">{{ $article->title }}</h3>
+                                    <p class="text-gray-600 mb-4 line-clamp-3">
+                                        {{ Str::limit(strip_tags($article->content), 150) }}
+                                    </p>
+                                    
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="{{ route('news.edit', $article) }}" 
+                                           class="bg-indigo-500 hover:bg-indigo-600 text-black px-3 py-1 rounded text-sm">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('news.destroy', $article) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="bg-red-500 hover:bg-red-600 text-red px-3 py-1 rounded text-sm"
+                                                    onclick="return confirm('Are you sure you want to delete this article?')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="col-span-full text-center py-8 text-gray-500">
+                                No articles found.
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <div class="mt-6">
+                        {{ $news->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout> 
