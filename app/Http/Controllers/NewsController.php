@@ -17,12 +17,36 @@ class NewsController extends Controller
     //     $this->middleware('auth');
     // }
 
-    public function index()
+    public function index(Request $request)
     {
-        $news = News::with('category')
-                    ->latest()
-                    ->paginate(9);
-        return view('news.index', compact('news'));
+        $query = News::with('category');
+
+        // Pencarian berdasarkan judul
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter berdasarkan kategori
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category_id', $request->category);
+        }
+
+        // Pengurutan
+        $sort = $request->get('sort', 'latest');
+        if ($sort === 'latest') {
+            $query->latest();
+        } elseif ($sort === 'oldest') {
+            $query->oldest();
+        } elseif ($sort === 'title_asc') {
+            $query->orderBy('title', 'asc');
+        } elseif ($sort === 'title_desc') {
+            $query->orderBy('title', 'desc');
+        }
+
+        $news = $query->paginate(9);
+        $categories = Category::all();
+        
+        return view('news.index', compact('news', 'categories'));
     }
 
     public function create()

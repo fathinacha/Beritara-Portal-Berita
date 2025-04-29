@@ -5,7 +5,7 @@
                 {{ __('News Management') }}
             </h2>
             <a href="{{ route('news.create') }}" 
-               class="bg-indigo-600 hover:bg-indigo-700 text-black font-bold py-2 px-4 rounded">
+               class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                 Add New Article
             </a>
         </div>
@@ -13,6 +13,61 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <form action="{{ route('news.index') }}" method="GET" class="flex flex-wrap gap-4">
+                        <!-- Search Input -->
+                        <div class="flex-1">
+                            <input type="text" 
+                                   name="search" 
+                                   placeholder="Cari berita..." 
+                                   value="{{ request('search') }}"
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="w-48">
+                            <select name="category" 
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="">Semua Kategori</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" 
+                                            {{ request('category') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Sort Options -->
+                        <div class="w-48">
+                            <select name="sort" 
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Terlama</option>
+                                <option value="title_asc" {{ request('sort') == 'title_asc' ? 'selected' : '' }}>Judul (A-Z)</option>
+                                <option value="title_desc" {{ request('sort') == 'title_desc' ? 'selected' : '' }}>Judul (Z-A)</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                Cari
+                            </button>
+                            @if(request()->has('search') || request()->has('category') || request()->has('sort'))
+                                <a href="{{ route('news.index') }}" 
+                                   class="ml-2 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @if(session('success'))
@@ -25,7 +80,7 @@
                         @forelse($news as $article)
                             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                                 @if($article->image)
-                                    <img src="{{ Storage::url($article->image) }}" 
+                                    <img src="{{ asset('storage/' . $article->image) }}" 
                                          alt="{{ $article->title }}"
                                          class="w-full h-48 object-cover">
                                 @else
@@ -51,14 +106,14 @@
                                     
                                     <div class="flex justify-end space-x-2">
                                         <a href="{{ route('news.edit', $article) }}" 
-                                           class="bg-indigo-500 hover:bg-indigo-600 text-black px-3 py-1 rounded text-sm">
+                                           class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded text-sm">
                                             Edit
                                         </a>
                                         <form action="{{ route('news.destroy', $article) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" 
-                                                    class="bg-red-500 hover:bg-red-600 text-red px-3 py-1 rounded text-sm"
+                                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
                                                     onclick="return confirm('Are you sure you want to delete this article?')">
                                                 Delete
                                             </button>
