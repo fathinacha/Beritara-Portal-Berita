@@ -63,7 +63,7 @@ class NewsController extends Controller
             'content' => $request->content,
             'category_id' => $request->category_id,
             'user_id' => auth()->id(),
-            'status' => $request->status // Tambahkan status dari form
+            'status' => $request->status
         ];
     
         if ($request->hasFile('image')) {

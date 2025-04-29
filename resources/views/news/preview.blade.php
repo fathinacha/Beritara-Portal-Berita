@@ -12,7 +12,6 @@
                                 Edit
                             </a>
 
-
                             <!-- Publish/Unpublish Button -->
                             <form action="{{ route('news.update.status', $news) }}" method="POST" class="inline">
                                 @csrf
