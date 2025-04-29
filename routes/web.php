@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;  // Tambahkan ini
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NewsController;
 

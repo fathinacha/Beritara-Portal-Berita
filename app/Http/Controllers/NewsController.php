@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\NewsRequest;
 
 class NewsController extends Controller
 {
@@ -30,15 +31,8 @@ class NewsController extends Controller
         return view('news.create', compact('categories'));
     }
 
-    public function store(Request $request)
+    public function store(NewsRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
         $data = [
             'title' => $request->title,
             'slug' => Str::slug($request->title),
@@ -64,15 +58,8 @@ class NewsController extends Controller
         return view('news.edit', compact('news', 'categories'));
     }
 
-    public function update(Request $request, News $news)
+    public function update(NewsRequest $request, News $news)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
         $data = [
             'title' => $request->title,
             'slug' => Str::slug($request->title),
@@ -81,7 +68,6 @@ class NewsController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            // Delete old image
             if ($news->image) {
                 Storage::disk('public')->delete($news->image);
             }
