@@ -21,7 +21,7 @@
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Create Category
                             </button>
                             <a href="{{ route('categories.index') }}" class="text-gray-600 hover:text-gray-900">Cancel</a>

@@ -34,6 +34,11 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('news', NewsController::class);
+    Route::get('/news/{news}/preview', [NewsController::class, 'preview'])
+        ->name('news.preview')
+        ->middleware('auth');
+    Route::put('/news/{news}/status', [NewsController::class, 'updateStatus'])
+        ->name('news.update.status');
 });
 
 require __DIR__.'/auth.php';

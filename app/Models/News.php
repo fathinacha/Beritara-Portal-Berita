@@ -12,7 +12,10 @@ class News extends Model
         'content',
         'image',
         'category_id',
-        'user_id'
+        'user_id',
+        'status',
+        'is_featured',
+        'views'
     ];
 
     public function category()

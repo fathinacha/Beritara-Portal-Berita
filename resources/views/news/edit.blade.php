@@ -85,7 +85,7 @@
                                     Cancel
                                 </a>
                                 <button type="submit" 
-                                        class="bg-indigo-600 hover:bg-indigo-700 text-black font-bold py-2 px-4 rounded">
+                                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                                     Update Article
                                 </button>
                             </div>

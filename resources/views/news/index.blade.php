@@ -94,8 +94,8 @@
                                         <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
                                             {{ $article->category->name }}
                                         </span>
-                                        <span class="text-gray-500 text-sm">
-                                            {{ $article->created_at->format('M d, Y') }}
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded {{ $article->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                            {{ $article->status === 'published' ? 'Published' : 'Draft' }}
                                         </span>
                                     </div>
                                     
@@ -105,10 +105,34 @@
                                     </p>
                                     
                                     <div class="flex justify-end space-x-2">
+                                        <!-- Preview Button -->
+                                        <a href="{{ route('news.preview', $article) }}" 
+                                           class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                                            Preview
+                                        </a>
+
+                                        <!-- Publish/Unpublish Button -->
+                                        <form action="{{ route('news.update.status', $article) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" 
+                                                   value="{{ $article->status === 'published' ? 'draft' : 'published' }}">
+                                            <button type="submit" 
+                                                    onclick="return confirm('Apakah Anda yakin ingin {{ $article->status === 'published' ? 'membatalkan publikasi' : 'mempublikasikan' }} berita ini?')"
+                                                    class="{{ $article->status === 'published' 
+                                                        ? 'bg-yellow-500 hover:bg-yellow-600' 
+                                                        : 'bg-green-500 hover:bg-green-600' }} text-white px-3 py-1 rounded text-sm">
+                                                {{ $article->status === 'published' ? 'Unpublish' : 'Publish' }}
+                                            </button>
+                                        </form>
+
+                                        <!-- Edit Button -->
                                         <a href="{{ route('news.edit', $article) }}" 
                                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded text-sm">
                                             Edit
                                         </a>
+
+                                        <!-- Delete Button -->
                                         <form action="{{ route('news.destroy', $article) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -119,6 +143,7 @@
                                             </button>
                                         </form>
                                     </div>
+
                                 </div>
                             </div>
                         @empty
@@ -135,4 +160,4 @@
             </div>
         </div>
     </div>
-</x-app-layout> 
+</x-app-layout>

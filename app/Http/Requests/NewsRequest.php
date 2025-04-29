@@ -13,11 +13,18 @@ class NewsRequest extends FormRequest
 
     public function rules()
     {
+        if ($this->has('status') && !$this->has('title')) {
+            return [
+                'status' => 'required|in:draft,published'
+            ];
+        }
+
         return [
             'title' => 'required|string|min:10|max:255',
             'content' => 'required|string|min:100',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'status' => 'required|in:draft,published'
         ];
     }
 
@@ -34,7 +41,9 @@ class NewsRequest extends FormRequest
             'image.required' => 'Gambar berita wajib diupload',
             'image.image' => 'File harus berupa gambar',
             'image.mimes' => 'Format gambar harus jpeg, png, atau jpg',
-            'image.max' => 'Ukuran gambar maksimal 2MB'
+            'image.max' => 'Ukuran gambar maksimal 2MB',
+            'status.required' => 'Status berita wajib dipilih',
+            'status.in' => 'Status berita harus draft atau published'
         ];
     }
 }

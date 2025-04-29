@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->boolean('is_featured')->default(false);
             $table->integer('views')->default(0);
+            $table->enum('status', ['draft', 'published'])->default('published');
             $table->timestamps();
         });
     }

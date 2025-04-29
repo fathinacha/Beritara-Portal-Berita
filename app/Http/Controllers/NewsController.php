@@ -62,18 +62,25 @@ class NewsController extends Controller
             'slug' => Str::slug($request->title),
             'content' => $request->content,
             'category_id' => $request->category_id,
-            'user_id' => auth()->id()
+            'user_id' => auth()->id(),
+            'status' => $request->status // Tambahkan status dari form
         ];
-
+    
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('news', 'public');
             $data['image'] = $path;
         }
-
-        News::create($data);
-
+    
+        $news = News::create($data);
+    
+        // Jika status draft, redirect ke preview
+        if ($request->status === 'draft') {
+            return redirect()->route('news.preview', $news)
+                ->with('success', 'Berita berhasil disimpan sebagai draft.');
+        }
+    
         return redirect()->route('news.index')
-            ->with('success', 'Article created successfully.');
+            ->with('success', 'Berita berhasil dipublikasikan.');
     }
 
     public function edit(News $news)
@@ -84,11 +91,25 @@ class NewsController extends Controller
 
     public function update(NewsRequest $request, News $news)
     {
+        // Jika request hanya mengubah status
+        if ($request->has('status') && !$request->has('title')) {
+            $news->update(['status' => $request->status]);
+            
+            $message = $request->status === 'published' 
+                ? 'Berita berhasil dipublikasikan.'
+                : 'Berita berhasil diubah menjadi draft.';
+                
+            return redirect()->route('news.index')
+                ->with('success', $message);
+        }
+
+        // Jika update penuh (dari halaman edit)
         $data = [
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'content' => $request->content,
-            'category_id' => $request->category_id
+            'category_id' => $request->category_id,
+            'status' => $request->status
         ];
 
         if ($request->hasFile('image')) {
@@ -103,7 +124,23 @@ class NewsController extends Controller
         $news->update($data);
 
         return redirect()->route('news.index')
-            ->with('success', 'Article updated successfully.');
+            ->with('success', 'Berita berhasil diperbarui.');
+    }
+
+    public function updateStatus(Request $request, News $news)
+    {
+        $request->validate([
+            'status' => 'required|in:draft,published'
+        ]);
+
+        $news->update(['status' => $request->status]);
+        
+        $message = $request->status === 'published' 
+            ? 'Berita berhasil dipublikasikan.'
+            : 'Berita berhasil diubah menjadi draft.';
+            
+        return redirect()->route('news.index')
+            ->with('success', $message);
     }
 
     public function destroy(News $news)
@@ -117,4 +154,14 @@ class NewsController extends Controller
         return redirect()->route('news.index')
             ->with('success', 'Article deleted successfully.');
     }
-} 
+
+    public function preview(News $news)
+    {
+        // Pastikan hanya admin yang bisa preview
+        if ($news->user_id !== auth()->id()) {
+            abort(403);
+        }
+    
+        return view('news.preview', compact('news'));
+    }
+}
