@@ -8,7 +8,12 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NewsController;
 
 Route::get('/', function () {
-    return view('welcome');
+    $news = App\Models\News::with('category')
+        ->where('status', 'published')
+        ->latest()
+        ->get();
+    $categories = App\Models\Category::all();
+    return view('welcome', compact('news', 'categories'));
 });
 
 Route::get('/dashboard', function () {
