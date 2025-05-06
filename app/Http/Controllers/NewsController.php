@@ -191,6 +191,9 @@ class NewsController extends Controller
             ->where('status', 'published')
             ->firstOrFail();
     
+        // Increment view count
+        $article->increment('views');
+    
         $relatedArticles = News::where('category_id', $article->category_id)
             ->where('id', '!=', $article->id)
             ->where('status', 'published')
