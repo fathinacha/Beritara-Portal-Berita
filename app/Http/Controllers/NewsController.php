@@ -164,4 +164,24 @@ class NewsController extends Controller
     
         return view('news.preview', compact('news'));
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+        
+        $news = News::where('status', 'published')
+            ->where(function($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('content', 'like', "%{$query}%");
+            })
+            ->with('category')
+            ->latest()
+            ->paginate(12);
+        
+        return view('news.search', [
+            'news' => $news,
+            'query' => $query,
+            'categories' => Category::all()
+        ]);
+    }
 }

@@ -11,8 +11,14 @@
                 </a>
             </div>
             <div class="flex items-center space-x-4">
-                <form class="flex">
-                    <input type="text" placeholder="Search..." class="px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <form action="{{ route('search') }}" method="GET" class="flex">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        placeholder="Search..." 
+                        class="px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value="{{ request('q') }}"
+                    >
                     <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700">
                         Search
                     </button>

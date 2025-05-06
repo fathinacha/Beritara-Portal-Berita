@@ -47,5 +47,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->name('category.show');
+Route::get('/search', [NewsController::class, 'search'])->name('search');
 
 require __DIR__.'/auth.php';
