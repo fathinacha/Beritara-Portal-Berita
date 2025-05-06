@@ -46,4 +46,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('news.update.status');
 });
 
+Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->name('category.show');
+
 require __DIR__.'/auth.php';
