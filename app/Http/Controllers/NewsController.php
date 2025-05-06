@@ -184,4 +184,24 @@ class NewsController extends Controller
             'categories' => Category::all()
         ]);
     }
+
+    public function detail($slug)
+    {
+        $article = News::where('slug', $slug)
+            ->where('status', 'published')
+            ->firstOrFail();
+    
+        $relatedArticles = News::where('category_id', $article->category_id)
+            ->where('id', '!=', $article->id)
+            ->where('status', 'published')
+            ->latest()
+            ->take(3)
+            ->get();
+    
+        return view('news.detail', [
+            'article' => $article,
+            'relatedArticles' => $relatedArticles,
+            'categories' => Category::all()
+        ]);
+    }
 }
