@@ -4,17 +4,23 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('News Management') }}
             </h2>
-            <a href="{{ route('news.create') }}" 
-               class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                Add New Article
-            </a>
         </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Tambah Berita Button -->
+            <div class="mb-6">
+                <a href="{{ route('news.create') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah Berita Baru
+                </a>
+            </div>
 
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6">
                     <form action="{{ route('news.index') }}" method="GET" class="flex flex-wrap gap-4">
                         <!-- Search Input -->
