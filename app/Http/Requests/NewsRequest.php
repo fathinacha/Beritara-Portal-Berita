@@ -19,31 +19,32 @@ class NewsRequest extends FormRequest
             ];
         }
 
-        return [
+        $rules = [
             'title' => 'required|string|min:10|max:255',
             'content' => 'required|string|min:100',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:draft,published'
         ];
+
+        // Validasi gambar
+        if ($this->isMethod('POST')) {
+            
+            $rules['image'] = 'required|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=600,min_height=400';
+        } else {
+            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=600,min_height=400';
+        }
+        return $rules;
     }
 
+    // Tambahkan pesan error kustom
     public function messages()
     {
         return [
-            'title.required' => 'Judul berita wajib diisi',
-            'title.min' => 'Judul berita minimal 10 karakter',
-            'title.max' => 'Judul berita maksimal 255 karakter',
-            'content.required' => 'Konten berita wajib diisi',
-            'content.min' => 'Konten berita minimal 100 karakter',
-            'category_id.required' => 'Kategori berita wajib dipilih',
-            'category_id.exists' => 'Kategori yang dipilih tidak valid',
-            'image.required' => 'Gambar berita wajib diupload',
-            'image.image' => 'File harus berupa gambar',
-            'image.mimes' => 'Format gambar harus jpeg, png, atau jpg',
-            'image.max' => 'Ukuran gambar maksimal 2MB',
-            'status.required' => 'Status berita wajib dipilih',
-            'status.in' => 'Status berita harus draft atau published'
+            'image.required' => 'Gambar berita wajib diunggah.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus jpeg, png, atau jpg.',
+            'image.max' => 'Ukuran gambar maksimal 2MB.',
+            'image.dimensions' => 'Dimensi gambar minimal 600x400 pixel.'
         ];
     }
 }

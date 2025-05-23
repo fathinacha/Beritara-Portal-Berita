@@ -57,74 +57,102 @@ class NewsController extends Controller
 
     public function store(NewsRequest $request)
     {
-        $data = [
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'content' => $request->content,
-            'category_id' => $request->category_id,
-            'user_id' => auth()->id(),
-            'status' => $request->status
-        ];
-    
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('news', 'public');
-            $data['image'] = $path;
+        try {
+            $data = [
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
+                'content' => $request->content,
+                'category_id' => $request->category_id,
+                'user_id' => auth()->id(),
+                'status' => $request->status
+            ];
+        
+            if ($request->hasFile('image')) {
+                try {
+                    $path = $request->file('image')->store('news', 'public');
+                    $data['image'] = $path;
+                } catch (\Exception $e) {
+                    return back()
+                        ->withInput()
+                        ->withErrors(['image' => 'Gagal mengunggah gambar. Silakan coba lagi.']);
+                }
+            }
+        
+            $news = News::create($data);
+            
+            return redirect()
+                ->route($request->status === 'draft' ? 'news.preview' : 'news.index', $news)
+                ->with('success', $request->status === 'draft' ? 
+                    'Berita berhasil disimpan sebagai draft.' : 
+                    'Berita berhasil dipublikasikan.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan berita.']);
         }
+    }
+
+    public function update(NewsRequest $request, News $news)
+    {
+        try {
+            $data = [
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
+                'content' => $request->content,
+                'category_id' => $request->category_id,
+                'status' => $request->status
+            ];
     
-        $news = News::create($data);
+            if ($request->hasFile('image')) {
+                try {
+                    // Hapus gambar lama jika ada
+                    if ($news->image && Storage::disk('public')->exists($news->image)) {
+                        Storage::disk('public')->delete($news->image);
+                    }
     
-        // Jika status draft, redirect ke preview
-        if ($request->status === 'draft') {
-            return redirect()->route('news.preview', $news)
-                ->with('success', 'Berita berhasil disimpan sebagai draft.');
+                    // Upload gambar baru
+                    $path = $request->file('image')->store('news', 'public');
+                    $data['image'] = $path;
+                } catch (\Exception $e) {
+                    return back()
+                        ->withInput()
+                        ->withErrors(['image' => 'Gagal mengunggah gambar. Silakan coba lagi.']);
+                }
+            }
+    
+            $news->update($data);
+    
+            return redirect()
+                ->route('news.index')
+                ->with('success', 'Berita berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Terjadi kesalahan saat memperbarui berita.']);
         }
+    }
+
+    public function destroy(News $news)
+    {
+        try {
+            // Hapus gambar dari storage
+            if ($news->image && Storage::disk('public')->exists($news->image)) {
+                Storage::disk('public')->delete($news->image);
+            }
     
-        return redirect()->route('news.index')
-            ->with('success', 'Berita berhasil dipublikasikan.');
+            $news->delete();
+            return redirect()
+                ->route('news.index')
+                ->with('success', 'Berita berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus berita.']);
+        }
     }
 
     public function edit(News $news)
     {
         $categories = Category::all();
         return view('news.edit', compact('news', 'categories'));
-    }
-
-    public function update(NewsRequest $request, News $news)
-    {
-        // Jika request hanya mengubah status
-        if ($request->has('status') && !$request->has('title')) {
-            $news->update(['status' => $request->status]);
-            
-            $message = $request->status === 'published' 
-                ? 'Berita berhasil dipublikasikan.'
-                : 'Berita berhasil diubah menjadi draft.';
-                
-            return redirect()->route('news.index')
-                ->with('success', $message);
-        }
-
-        // Jika update penuh (dari halaman edit)
-        $data = [
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'content' => $request->content,
-            'category_id' => $request->category_id,
-            'status' => $request->status
-        ];
-
-        if ($request->hasFile('image')) {
-            if ($news->image) {
-                Storage::disk('public')->delete($news->image);
-            }
-            
-            $path = $request->file('image')->store('news', 'public');
-            $data['image'] = $path;
-        }
-
-        $news->update($data);
-
-        return redirect()->route('news.index')
-            ->with('success', 'Berita berhasil diperbarui.');
     }
 
     public function updateStatus(Request $request, News $news)
@@ -141,18 +169,6 @@ class NewsController extends Controller
             
         return redirect()->route('news.index')
             ->with('success', $message);
-    }
-
-    public function destroy(News $news)
-    {
-        if ($news->image) {
-            Storage::disk('public')->delete($news->image);
-        }
-        
-        $news->delete();
-
-        return redirect()->route('news.index')
-            ->with('success', 'Article deleted successfully.');
     }
 
     public function preview(News $news)
